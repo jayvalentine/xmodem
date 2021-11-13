@@ -1,2 +1,9 @@
 # xmodem
-Simple XMODEM server implemented in C for POSIX
+
+This is a simple XMODEM server implemented in C.
+
+Currently it does not handle:
+
+* Retries
+* Timeouts
+* Block numbering
