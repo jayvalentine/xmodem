@@ -90,6 +90,8 @@ int main(int argc, char ** argv)
 
     FILE * f = fopen(filename, "rb");
 
+    fprintf(stderr, "Initiate transfer on client side now.\r\n");
+
     /* Wait for initial NAK */
     xmodem_wait_nak();
 
@@ -114,23 +116,26 @@ int main(int argc, char ** argv)
         xmodem_send(0xa5);
         xmodem_send(0x5a);
 
-        for (int i = 0; i < 128; i++)
+        for (int i = 0; i < 64; i++)
         {
             fprintf(stderr, " ");
         }
-        fprintf(stderr, "|");
-        fprintf(stderr, "\r");
+        fprintf(stderr, "|\r\n");
+        for (int i = 0; i < 64; i++)
+        {
+            fprintf(stderr, " ");
+        }
+        fprintf(stderr, "|\r\033[1A");
         fflush(stderr);
 
         /* Send data bytes. */
         for (int i = 0; i < 128; i++)
         {
+            if (i == 64) fprintf(stderr, "\r\n");
             xmodem_send(data[i]);
             fprintf(stderr, "#");
             fflush(stderr);
         }
-
-        fprintf(stderr, "\r\n");
 
         /* Send checksum. Also arbitrary for now. */
         xmodem_send(0x03);
@@ -140,9 +145,11 @@ int main(int argc, char ** argv)
 
         /* Last block of file? */
         if (bytes_read < 128) break;
+
+        fprintf(stderr, "\r\033[2A");
     }
 
-    fprintf(stderr, "Waiting for final ACK...\r\n");
+    fprintf(stderr, "\r\nWaiting for final ACK...\r\n");
 
     /* End of file. Send end-of-transmission. */
     xmodem_send(EOT);
